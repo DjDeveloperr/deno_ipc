@@ -1,0 +1,15 @@
+[package]
+name = "deno_ipc"
+version = "0.1.0"
+authors = ["DjDeveloperr <djsandhu2005@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+interprocess = "1.0.1"
+lazy_static = "1.4.0"
+deno_core = "0.75.0"
+
+[lib]
+crate-type = ["cdylib"]

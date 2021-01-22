@@ -66,8 +66,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: 0.0.2
-          name: v0.0.2
+          tag_name: 0.0.3
+          name: v0.0.3
           draft: true
           files: |
             target/release/libdeno_ipc.dylib

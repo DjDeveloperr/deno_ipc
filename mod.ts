@@ -1,6 +1,6 @@
 import { Plug } from "https://deno.land/x/plug@0.2.7/mod.ts";
 
-const VERSION = "0.0.2";
+const VERSION = "0.0.3";
 const POLICY =
   Deno.env.get("PLUGIN_URL") === undefined
     ? Plug.CachePolicy.STORE
@@ -57,6 +57,10 @@ function op_ipc_read_string(id: number): string {
   return dispatch("op_ipc_read_string", id);
 }
 
+function op_ipc_read_bytes(id: number, len: number): string {
+  return dispatch("op_ipc_read_bytes", id, len);
+}
+
 function op_ipc_write_all(id: number, data: string | Uint8Array): void {
   dispatch("op_ipc_write_all", id, data);
 }
@@ -72,8 +76,10 @@ export class IPC {
   }
 
   /** Read from the socket to String. */
-  read(): string {
-    return op_ipc_read_string(this.#id);
+  read(len?: number): string {
+    return len
+      ? op_ipc_read_bytes(this.#id, len)
+      : op_ipc_read_string(this.#id);
   }
 
   /** Write to the Socket. */

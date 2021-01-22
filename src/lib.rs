@@ -1,5 +1,3 @@
-#![allow(unreachable_code)]
-
 use interprocess::local_socket::LocalSocketStream;
 use std::collections::HashMap;
 use std::cell::RefCell;
@@ -19,6 +17,7 @@ pub fn deno_plugin_init(interface: &mut dyn Interface) {
     interface.register_op("op_ipc_close", op_ipc_close);
     interface.register_op("op_ipc_write_all", op_ipc_write_all);
     interface.register_op("op_ipc_read_string", op_ipc_read_string);
+    interface.register_op("op_ipc_read_bytes", op_ipc_read_bytes);
 }
 
 fn op(res: &str) -> Op {
@@ -111,6 +110,30 @@ fn op_ipc_write_all(
     })
 }
 
+fn op_ipc_read_bytes(
+    _interface: &mut dyn Interface,
+    _args: &mut [ZeroCopyBuf]
+) -> Op {
+    let id = u32::from_str(std::str::from_utf8(_args.get(0).unwrap()).unwrap()).unwrap();
+    let len = usize::from_str(std::str::from_utf8(_args.get(1).unwrap()).unwrap()).unwrap();
+
+    SOCKETS.with(|mapref| {
+        let mut map = mapref.borrow_mut();
+        if let Some(sock) = map.get_mut(&id) {
+            let mut slice: Vec<u8> = vec! { 1; len };
+            let res = sock.read(slice.as_mut_slice());
+            if res.is_err() {
+                err(&res.unwrap_err().to_string())
+            } else {
+                let string = std::str::from_utf8(slice.as_slice()).unwrap();
+                op(string)
+            }
+        } else {
+            err("local socket connection not found")
+        }
+    })
+}
+
 fn op_ipc_read_string(
     _interface: &mut dyn Interface,
     _args: &mut [ZeroCopyBuf]
@@ -123,9 +146,8 @@ fn op_ipc_read_string(
             let mut vec = Vec::<u8>::new();
             let mut left = true;
             let mut is_err: Option<String> = Option::from(None);
-
             while left {
-                let mut slice: [u8; 1] = [0];
+                let mut slice = [0];
                 let res = sock.read(&mut slice);
                 if res.is_err() {
                     is_err = Option::from(res.unwrap_err().to_string());

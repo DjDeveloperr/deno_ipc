@@ -10,6 +10,7 @@ edition = "2018"
 interprocess = "1.0.1"
 lazy_static = "1.4.0"
 deno_core = "0.75.0"
+bytes = { version = "1", features = ["serde"] }
 
 [lib]
 crate-type = ["cdylib"]

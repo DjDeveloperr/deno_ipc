@@ -1,4 +1,19 @@
-Deno.openPlugin("./target/debug/deno_ipc.dll");
+import { Plug } from "https://deno.land/x/plug@0.2.7/mod.ts";
+
+const VERSION = "0.0.1";
+const POLICY =
+  Deno.env.get("PLUGIN_URL") === undefined
+    ? Plug.CachePolicy.STORE
+    : Plug.CachePolicy.NONE;
+const PLUGIN_URL =
+  Deno.env.get("PLUGIN_URL") ??
+  `https://github.com/DjDeveloperr/deno_ipc/releases/download/refs%2Ftags%2F${VERSION}/`;
+
+await Plug.prepare({
+  name: "deno_ipc",
+  url: PLUGIN_URL,
+  policy: POLICY,
+});
 
 const core = (Deno as any).core;
 const ops = core.ops();

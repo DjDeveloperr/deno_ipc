@@ -1,4 +1,4 @@
-# deno_ipc
+# (Deprecated) deno_ipc
 
 This is a Deno plugin made in Rust, to do cross-platform Interprocess communication. Only Client implementation at the moment.
 
